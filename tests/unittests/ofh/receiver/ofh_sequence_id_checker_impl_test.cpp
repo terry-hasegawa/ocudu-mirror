@@ -179,6 +179,26 @@ TEST(ofh_sequence_id_checker_impl, message_from_the_past_does_not_modify_interna
   ASSERT_EQ(-1, checker.update_and_compare_seq_id(eaxc, seq_id));
 }
 
+TEST(ofh_sequence_id_checker_impl, supports_full_16_bit_eaxc_id_range)
+{
+  // Per O-RAN.WG4.CUS-Spec section 3.1.3.1.6 the eAxC ID spans the full 16-bit range [0x0000, 0xFFFF].
+  sequence_id_checker_impl checker;
+
+  // Upper bound of the eAxC ID range.
+  unsigned eaxc_max = MAX_SUPPORTED_EAXC_ID_VALUE - 1;
+  ASSERT_EQ(eaxc_max, 0xFFFF);
+  ASSERT_EQ(0, checker.update_and_compare_seq_id(eaxc_max, 1));
+  ASSERT_EQ(0, checker.update_and_compare_seq_id(eaxc_max, 2));
+
+  // eAxC IDs that share a low byte must be tracked independently (e.g. 0x0003 and 0x0103).
+  unsigned eaxc_low  = 0x0003;
+  unsigned eaxc_high = 0x0103;
+  ASSERT_EQ(0, checker.update_and_compare_seq_id(eaxc_low, 10));
+  ASSERT_EQ(0, checker.update_and_compare_seq_id(eaxc_high, 200));
+  ASSERT_EQ(0, checker.update_and_compare_seq_id(eaxc_low, 11));
+  ASSERT_EQ(0, checker.update_and_compare_seq_id(eaxc_high, 201));
+}
+
 TEST(ofh_sequence_id_checker_impl,
      message_from_the_past_does_not_modify_internal_seq_id_and_will_resume_if_gets_to_the_expected_seq_id)
 {
