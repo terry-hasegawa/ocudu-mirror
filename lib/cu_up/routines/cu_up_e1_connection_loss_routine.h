@@ -1,0 +1,43 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+// Portions of this file may implement 3GPP specifications, which may be subject to additional licensing requirements.
+
+#pragma once
+
+#include "../ue_manager.h"
+#include "ocudu/ocudulog/logger.h"
+#include "ocudu/support/async/async_task.h"
+
+namespace ocudu::ocuup {
+
+class cu_up_e1_connection_loss_routine
+{
+public:
+  cu_up_e1_connection_loss_routine(gnb_cu_up_id_t           cu_up_id_,
+                                   std::string              cu_up_name_,
+                                   std::string              plmn_,
+                                   std::atomic<bool>&       stop_command,
+                                   e1ap_connection_manager& e1ap_conn_mng_,
+                                   ue_manager&              ue_mng_,
+                                   timer_manager&           timers,
+                                   task_executor&           ctrl_exec);
+
+  void operator()(coro_context<async_task<void>>& ctx);
+
+  static const char* name() { return "CU-UP E1 connection loss routine"; }
+
+private:
+  gnb_cu_up_id_t     cu_up_id;
+  std::string        cu_up_name;
+  std::string        plmn;
+  std::atomic<bool>& stop_command;
+
+  unique_timer             retry_timer;
+  e1ap_connection_manager& e1ap_conn_mng;
+  ue_manager&              ue_mng;
+  ocudulog::basic_logger&  logger;
+
+  bool reconnected;
+};
+
+} // namespace ocudu::ocuup

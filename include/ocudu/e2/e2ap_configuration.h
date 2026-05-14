@@ -1,0 +1,55 @@
+// SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+// Portions of this file may implement 3GPP specifications, which may be subject to additional licensing requirements.
+
+#pragma once
+
+#include "ocudu/ran/gnb_cu_up_id.h"
+#include "ocudu/ran/gnb_du_id.h"
+#include "ocudu/ran/gnb_id.h"
+#include <optional>
+#include <string>
+#include <vector>
+
+namespace ocudu {
+
+/// \brief E2AP configuration
+struct e2ap_configuration {
+  gnb_id_t                      gnb_id = {0, 22};
+  std::string                   plmn; /// Full PLMN as string (without possible filler digit) e.g. "00101"
+  std::optional<gnb_du_id_t>    gnb_du_id;
+  std::optional<gnb_cu_up_id_t> gnb_cu_up_id;
+  unsigned                      max_setup_retries = 5;
+  bool                          e2sm_kpm_enabled  = false;
+  bool                          e2sm_rc_enabled   = false;
+  bool                          e2sm_ccc_enabled  = false;
+};
+
+/// E2 Agent configuration.
+struct e2_config {
+  /// Whether to enable E2 agent.
+  bool enable_unit_e2 = false;
+  /// RIC IP addresses.
+  std::vector<std::string> ip_addrs = {"127.0.0.1"};
+  /// RIC port.
+  uint16_t port = 36421;
+  /// Local IP addresses to bind for RIC connection.
+  std::vector<std::string> bind_addrs = {"127.0.0.1"};
+  /// SCTP initial RTO value for RIC connection.
+  int sctp_rto_initial = 120;
+  /// SCTP RTO min for RIC connection.
+  int sctp_rto_min = 120;
+  /// SCTP RTO max for RIC connection.
+  int sctp_rto_max = 500;
+  /// SCTP init max attempts for RIC connection.
+  int sctp_init_max_attempts = 3;
+  /// SCTP max init timeout for RIC connection.
+  int sctp_max_init_timeo = 500;
+  /// Whether to enable KPM service module.
+  bool e2sm_kpm_enabled = false;
+  /// Whether to enable RC service module.
+  bool e2sm_rc_enabled = false;
+  /// Whether to enable CCC service module.
+  bool e2sm_ccc_enabled = false;
+};
+} // namespace ocudu

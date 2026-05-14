@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+# SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+
+set -e # stop executing after error
+
+main() {
+
+    # Check number of args
+    if [ $# != 0 ] && [ $# != 1 ]; then
+        echo >&2 "Illegal number of parameters"
+        echo >&2 "Run like this: \"./install_rohc_dependencies.sh [<mode>]\" where mode could be: build, run and all"
+        echo >&2 "If mode is not specified, all dependencies will be installed"
+        exit 1
+    fi
+
+    local mode="${1:-all}"
+
+    # shellcheck source=/dev/null
+    . /etc/os-release
+
+    if [[ "$ID" == "debian" || "$ID" == "ubuntu" ]]; then
+        if [[ "$mode" == "all" || "$mode" == "build" ]]; then
+            DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-install-recommends \
+                curl ca-certificates build-essential xz-utils autotools-dev automake libtool libpcap-dev libcmocka-dev
+
+        fi
+        if [[ "$mode" == "all" || "$mode" == "run" ]]; then
+            : # noop, nothing needed
+        fi
+    else
+        echo "OS $ID not supported"
+        exit 1
+    fi
+
+}
+
+main "$@"
