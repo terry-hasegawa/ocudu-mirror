@@ -17,8 +17,10 @@ class sequence_id_checker_impl : public sequence_id_checker
   static constexpr int NOF_SEQUENCES_IDENTIFIERS      = 1u << 8;
   static constexpr int HALF_NOF_SEQUENCES_IDENTIFIERS = NOF_SEQUENCES_IDENTIFIERS / 2;
 
-  bounded_bitset<MAX_SUPPORTED_EAXC_ID_VALUE>                        initialized;
-  static_circular_map<uint8_t, uint8_t, MAX_SUPPORTED_EAXC_ID_VALUE> counters;
+  // The eAxC ID key spans the full 16-bit range per O-RAN.WG4.CUS-Spec section 3.1.3.1.6, so it must be uint16_t to
+  // avoid truncating IDs above 255.
+  bounded_bitset<MAX_SUPPORTED_EAXC_ID_VALUE>                         initialized;
+  static_circular_map<uint16_t, uint8_t, MAX_SUPPORTED_EAXC_ID_VALUE> counters;
 
 public:
   /// Default constructor.

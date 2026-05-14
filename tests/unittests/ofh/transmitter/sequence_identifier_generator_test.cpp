@@ -47,6 +47,25 @@ TEST(sequence_identifier_generator, sequence_id_values_fit_in_one_byte)
   ASSERT_EQ(gen.generate(eaxc), 0);
 }
 
+TEST(sequence_identifier_generator, supports_full_16_bit_eaxc_id_range)
+{
+  // Per O-RAN.WG4.CUS-Spec section 3.1.3.1.6 the eAxC ID spans the full 16-bit range [0x0000, 0xFFFF].
+  sequence_identifier_generator gen;
+
+  // Upper bound of the eAxC ID range.
+  unsigned eaxc_max = MAX_SUPPORTED_EAXC_ID_VALUE - 1;
+  ASSERT_EQ(eaxc_max, 0xFFFF);
+  ASSERT_EQ(gen.generate(eaxc_max), 0);
+  ASSERT_EQ(gen.generate(eaxc_max), 1);
+
+  // eAxC IDs that share a low byte must not collide (e.g. 0x0002 and 0x0102).
+  unsigned eaxc_low  = 0x0002;
+  unsigned eaxc_high = 0x0102;
+  ASSERT_EQ(gen.generate(eaxc_low), 0);
+  ASSERT_EQ(gen.generate(eaxc_high), 0);
+  ASSERT_EQ(gen.generate(eaxc_low), 1);
+}
+
 #ifdef ASSERTS_ENABLED
 TEST(sequence_identifier_generator, death_when_eaxc_value_is_not_supported)
 {
