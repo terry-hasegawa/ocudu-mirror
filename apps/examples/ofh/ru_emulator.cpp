@@ -479,9 +479,10 @@ class ru_emulator : public frame_notifier
   std::vector<prach_eaxc_buffers> test_prach;
   // Number of OFDM symbols comprising PRACH U-Plane transmission.
   unsigned nof_prach_symbols;
-  // Keeps track of last used seq_id for each eAxC.
-  static_circular_map<uint8_t, uint8_t, MAX_SUPPORTED_EAXC_ID_VALUE> seq_counters;
-  static_circular_map<uint8_t, uint8_t, MAX_SUPPORTED_EAXC_ID_VALUE> prach_seq_counters;
+  // Keeps track of last used seq_id for each eAxC. The eAxC ID key spans the full 16-bit range per
+  // O-RAN.WG4.CUS-Spec section 3.1.3.1.6, so it must be uint16_t to avoid truncating IDs above 255.
+  static_circular_map<uint16_t, uint8_t, MAX_SUPPORTED_EAXC_ID_VALUE> seq_counters;
+  static_circular_map<uint16_t, uint8_t, MAX_SUPPORTED_EAXC_ID_VALUE> prach_seq_counters;
   // Stores the list of configured eAxC for uplink, downlink and PRACH.
   static_vector<unsigned, MAX_NOF_SUPPORTED_EAXC> ul_eaxc;
   static_vector<unsigned, MAX_NOF_SUPPORTED_EAXC> dl_eaxc;

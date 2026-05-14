@@ -24,8 +24,9 @@ struct data_flow_uplane_resource_grid_context {
   uint8_t sector;
   /// Provides the port identifier.
   uint8_t port;
-  /// eAxC.
-  uint8_t eaxc;
+  /// eAxC ID. Per O-RAN.WG4.CUS-Spec section 3.1.3.1.6 the eAxC ID spans the full 16-bit range, so it must not be
+  /// stored in a narrower type.
+  unsigned eaxc;
   /// Symbol range.
   ofdm_symbol_range symbol_range;
 };
