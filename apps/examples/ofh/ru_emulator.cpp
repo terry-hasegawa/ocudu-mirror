@@ -433,8 +433,9 @@ static bool decode_rx_message(rx_message_info& message_info, span<const uint8_t>
   auto slot                 = slot_point(to_numerology_value(subcarrier_spacing::kHz30), frame, subframe, slot_id);
   message_info.symbol_point = {slot, symbol_id, MAX_NOF_SYMBOLS};
 
-  // Peek the eAxC.
-  message_info.eaxc = packet[19];
+  // Peek the eAxC. Per O-RAN.WG4.CUS-Spec section 3.1.3.1.6 the eAxC ID (ecpriRtcid/ecpriPcid) is a 16-bit field
+  // carried in network byte order, so both bytes must be decoded.
+  message_info.eaxc = (static_cast<uint16_t>(packet[18]) << 8) | static_cast<uint16_t>(packet[19]);
 
   // Peek sequence identifier.
   message_info.seq_id = packet[20];
@@ -515,19 +516,21 @@ public:
     ul_cp_seq_id_checker(std::move(dependencies.ul_cp_seq_id_checker)),
     prach_seq_id_checker(std::move(dependencies.prach_seq_id_checker))
   {
+    // MAX_SUPPORTED_EAXC_ID_VALUE is an exclusive upper bound (see O-RAN.WG4.CUS-Spec section 3.1.3.1.6), so a valid
+    // eAxC ID must be strictly less than it.
     for (auto eaxc : cfg.dl_eaxc) {
-      ocudu_assert(eaxc <= MAX_SUPPORTED_EAXC_ID_VALUE, "Unsupported DL eAxC value requested");
+      ocudu_assert(eaxc < MAX_SUPPORTED_EAXC_ID_VALUE, "Unsupported DL eAxC value requested");
       dl_eaxc.push_back(eaxc);
     }
 
     for (auto eaxc : cfg.ul_eaxc) {
-      ocudu_assert(eaxc <= MAX_SUPPORTED_EAXC_ID_VALUE, "Unsupported UL eAxC value requested");
+      ocudu_assert(eaxc < MAX_SUPPORTED_EAXC_ID_VALUE, "Unsupported UL eAxC value requested");
       ul_eaxc.push_back(eaxc);
       seq_counters.insert(eaxc, 0);
     }
 
     for (auto eaxc : cfg.prach_eaxc) {
-      ocudu_assert(eaxc <= MAX_SUPPORTED_EAXC_ID_VALUE, "Unsupported DL eAxC value requested");
+      ocudu_assert(eaxc < MAX_SUPPORTED_EAXC_ID_VALUE, "Unsupported PRACH eAxC value requested");
       prach_eaxc.push_back(eaxc);
       prach_seq_counters.insert(eaxc, 0);
     }
