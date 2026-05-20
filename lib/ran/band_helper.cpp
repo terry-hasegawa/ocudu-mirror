@@ -1553,8 +1553,8 @@ n_ta_offset ocudu::band_helper::get_ta_offset(nr_band band)
 n_ta_offset ocudu::band_helper::get_ta_offset(frequency_range freq_range)
 {
   if (freq_range == frequency_range::FR1) {
-    // Assume no LTE-NR coexistence.
-    return n_ta_offset::n25600;
+    // Assume LTE-NR coexistence (FR1 FDD).
+    return n_ta_offset::n0;
   }
   return n_ta_offset::n13792;
 }
