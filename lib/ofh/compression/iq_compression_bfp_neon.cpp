@@ -227,7 +227,7 @@ void iq_compression_bfp_neon::decompress(span<cbf16_t>                iq_data,
 
     // Compute scaling factor, first byte contains the exponent.
     uint8_t exponent = comp_prb_buffer[0];
-    float   scaler   = 1 << exponent;
+    float   scaler   = 1 << (exponent + 8);
 
     // Get view over the bytes following the compression parameter.
     comp_prb_buffer = comp_prb_buffer.last(comp_prb_buffer.size() - sizeof(exponent));

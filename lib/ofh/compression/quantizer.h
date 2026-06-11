@@ -97,7 +97,7 @@ public:
   ///
   /// \remark The size of \c x must be twice the size of \c z as \x is comprised by the quantized pairs of real and
   /// imaginary parts of complex values.
-  void to_brain_float(span<cbf16_t> z, span<const int16_t> x, int16_t in_scale) const
+  void to_brain_float(span<cbf16_t> z, span<const int16_t> x, int32_t in_scale) const
   {
     float scale = gain / in_scale;
     ocuduvec::convert(z, x, scale);
