@@ -96,7 +96,7 @@ void iq_compression_bfp_impl::decompress_prb_generic(span<cbf16_t>       output,
 
   // Compute scaling factor, first byte contains the exponent.
   uint8_t exponent = comp_prb[0];
-  int16_t scaler   = 1 << exponent;
+  int32_t scaler   = 1 << (exponent + 8);
 
   comp_prb             = comp_prb.last(comp_prb.size() - sizeof(exponent));
   auto bit_buff_reader = bit_buffer_reader::from_bytes(comp_prb);
